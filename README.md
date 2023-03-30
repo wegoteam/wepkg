@@ -1,2 +1,2 @@
 # wepkg
-工具类
+golang的工具库
