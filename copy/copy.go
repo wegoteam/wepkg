@@ -8,6 +8,14 @@ import (
 	"strconv"
 )
 
+/*
+*
+bean属性src拷贝给dst
+*/
+func BeanCopy(dst, src interface{}) (err error) {
+	return New(src).To(dst)
+}
+
 func isHard(k reflect.Kind) bool {
 	switch k {
 	case reflect.Map, reflect.Slice, reflect.Ptr, reflect.Interface:
