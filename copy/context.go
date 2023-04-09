@@ -5,27 +5,6 @@ import (
 	"reflect"
 )
 
-//func NewContext(val interface{}) (ctx *Context, err error) {
-//	ref := reflect.ValueOf(val)
-//
-//	if ref.Kind() != reflect.Ptr {
-//		err = errors.New("origin must ptr struct or map")
-//		return
-//	}
-//
-//	unfold := TypeUtiler.UnfoldType(ref.Type())
-//
-//	if unfold.Kind() != reflect.Struct && unfold.Kind() != reflect.Map {
-//		err = errors.New("origin must ptr struct or map")
-//		return
-//	}
-//
-//	ctx = &Context{
-//		valueA: Value(ref),
-//	}
-//	return
-//}
-
 func New(val interface{}) (ctx *Context) {
 	ref := reflect.ValueOf(val)
 	return NewValue(ref)
@@ -177,9 +156,6 @@ func (ctx *Context) InProcess(tag string) *Context {
 	return ctx
 }
 
-// ==============================================================
-//
-//
 type CopyContext struct {
 	//
 	ignore bool

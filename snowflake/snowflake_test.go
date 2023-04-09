@@ -1,60 +1,13 @@
-# wepkg
-## 基础组件
+package snowflake
 
-- 属性复制
-- 分布式雪花算法
-- 缓存（redis）
-- 字符
-- 文件
-- json
-- 时间日期
-- 条件表达式
-- 协程池
-- 切片
-...
+import (
+	"fmt"
+	"testing"
+	"time"
+)
 
-
-
-## 更新记录
-
-- v1.0.1：雪花算法
-- v1.0.0：bean属性拷贝
-
-
-
-## 使用案例
-
-安装
-
-```go
-go get -u github.com/wegoteam/wepkg
-```
-
-
-
-### bean属性拷贝
-
-```go
-type A struct {
-	Int    int
-	String string
-}
-
-func TestBeanCopy(t *testing.T) {
-	a1 := &A{Int: 100}
-	a2 := &A{}
-  copy.BeanCopy(a1, a2)
-	fmt.Println(a1, a2)
-}
-```
-
-
-
-### 生成雪花算法
-
-```go
 /**
-  Method：雪花计算方法,（1-漂移算法|2-传统算法），默认1
+    Method：雪花计算方法,（1-漂移算法|2-传统算法），默认1
 	BaseTime：基础时间（ms单位），不能超过当前系统时间
 	WorkerId：机器码，必须由外部设定，最大值 2^WorkerIdBitLength-1
 	WorkerIdBitLength：机器码位长，默认值6，取值范围 [1, 15]（要求：序列数位长+机器码位长不超过22）
@@ -65,7 +18,7 @@ func TestBeanCopy(t *testing.T) {
 */
 func TestSnowflake(t *testing.T) {
 	// 创建 IdGeneratorOptions 对象，可在构造函数中输入 WorkerId：
-	var options = snowflake.NewSnowflakeOptions(1)
+	var options = NewSnowflakeOptions(1)
 	options.Method = 1
 	options.WorkerIdBitLength = 6 // 默认值6，限定 WorkerId 最大值为2^6-1，即默认最多支持64个节点。
 	options.SeqBitLength = 6      // 默认值6，限制每毫秒生成的ID个数。若生成速度超过5万个/秒，建议加大 SeqBitLength 到 10。
@@ -73,17 +26,15 @@ func TestSnowflake(t *testing.T) {
 	// ...... 其它参数参考 SnowflakeOptions 定义。
 
 	// 保存参数（务必调用，否则参数设置不生效）：
-	snowflake.SetSnowflakeOptions(options)
+	SetSnowflakeOptions(options)
 
 	// 以上过程只需全局一次，且应在生成ID之前完成。
 
 	// 初始化后，在任何需要生成ID的地方，调用以下方法：
 
 	for {
-		var newId = snowflake.GenSnowflakeId()
+		var newId = GenSnowflakeId()
 		fmt.Println(newId)
 		time.Sleep(time.Second)
 	}
 }
-```
-
