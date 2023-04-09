@@ -105,13 +105,13 @@ func NewSnowWorkerM1(options *SnowflakeOptions) ISnowflake {
 		TurnBackIndex:          0,
 		IsOverCost:             false,
 		OverCostCountInOneTerm: 0,
-		// _GenCountInOneTerm:      0,
-		// _TermIndex:              0,
+		//GenCountInOneTerm:      0,
+		//TermIndex:              0,
 	}
 }
 
 // DoGenIDAction .
-func (m1 *SnowWorkerM1) DoGenIdAction(arg *OverCostAction) {
+func (m1 *SnowWorkerM1) GetSnowWorkerAction(arg *OverCostAction) {
 
 }
 
@@ -200,12 +200,12 @@ func (m1 *SnowWorkerM1) NextNormalId() int64 {
 
 	if m1.CurrentSeqNumber > m1.MaxSeqNumber {
 		m1.BeginOverCostAction(currentTimeTick)
-		// m1._TermIndex++
+		// m1.TermIndex++
 		m1.LastTimeTick++
 		m1.CurrentSeqNumber = m1.MinSeqNumber
 		m1.IsOverCost = true
 		m1.OverCostCountInOneTerm = 1
-		// m1._GenCountInOneTerm = 1
+		// m1.GenCountInOneTerm = 1
 
 		return m1.CalcId(m1.LastTimeTick)
 	}
