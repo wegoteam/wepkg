@@ -15,14 +15,6 @@ func SetSnowflakeOptions(options *SnowflakeOptions) {
 	singletonMutex.Unlock()
 }
 
-// GenSnowflakeId .
-func GenSnowflakeId() int64 {
-	if defaultSnowflake == nil {
-		panic("Please Initialize SnowflakeOptions")
-	}
-	return defaultSnowflake.NewNextId()
-}
-
 func ExtractTime(id int64) time.Time {
 	return defaultSnowflake.ExtractTime(id)
 }

@@ -35,3 +35,17 @@ func TestSnowflake(t *testing.T) {
 		time.Sleep(time.Second)
 	}
 }
+
+/**
+使用默认配置生成
+*/
+func TestSnowflakeId(t *testing.T) {
+	//返回字符串雪花算法ID
+	var newStrId = GetSnowflakeId()
+
+	fmt.Println(newStrId)
+
+	//返回int64雪花算法ID
+	newId := GenSnowflakeId()
+	fmt.Println(newId)
+}
