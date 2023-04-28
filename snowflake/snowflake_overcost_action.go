@@ -9,7 +9,7 @@ type OverCostAction struct {
 	TermIndex              int32
 }
 
-func (overcost OverCostAction) GetOverCostAction(workerId uint16, timeTick int64, actionType int32, overCostCountInOneTerm int32, genCountWhenOverCost int32, index int32) {
+func (overcost OverCostAction) GetOverCostAction(workerId uint16, timeTick int64, actionType, overCostCountInOneTerm, genCountWhenOverCost, index int32) {
 	overcost.ActionType = actionType
 	overcost.TimeTick = timeTick
 	overcost.WorkerId = workerId
