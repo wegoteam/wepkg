@@ -1,0 +1,29 @@
+hertz:
+  address: ":18080"
+  enablePprof: true
+  enableGzip: true
+  enableAccessLog: true
+  logLevel: info
+  logFileName: "log/hertz.log"
+  logMaxSize: 10
+  logMaxAge: 3
+  logMaxBackups: 50
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  db: "weflow"
+  username: "root"
+  password: "root"
+  charset: "utf8"
+  dsn: "root:root@tcp(127.0.0.1:3306)/weflow?charset=utf8&parseTime=True&loc=Local"
+
+redis:
+  address: "127.0.0.1:6379"
+  password: ""
+  db: 0
+
+mongo:
+  address: "127.0.0.1:27017"
+  username: ""
+  password: ""

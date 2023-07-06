@@ -13,8 +13,6 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-go.sum
-go.work.sum
 
 ./vendor/
 vendor/

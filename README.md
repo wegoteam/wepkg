@@ -17,6 +17,7 @@
 
 ## 更新记录
 
+- v1.0.3：加载配置
 - v1.0.1：雪花算法
 - v1.0.0：bean属性拷贝
 
@@ -96,3 +97,8 @@ func TestSnowflakeId(t *testing.T) {
 
 ```
 
+贡献来源：
+
+https://github.com/spf13/viper
+
+https://github.com/redis/go-redis
