@@ -36,6 +36,8 @@ func TestViper(t *testing.T) {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 	var mysql = &MySQL{}
+	var hertz = &Hertz{}
+	err = viper.UnmarshalKey("hertz", hertz)
 	err = viper.UnmarshalKey("mysql", mysql)
 	if err != nil {
 		fmt.Println(err)
@@ -52,6 +54,9 @@ func TestViper(t *testing.T) {
 	fmt.Println(val)
 	fmt.Println(red)
 	fmt.Println(mysql)
+	fmt.Println(hertz)
 	keys := viper.AllKeys()
-	fmt.Println(keys)
+	for _, key := range keys {
+		fmt.Printf("key=%s,val=%s \n", key, viper.Get(key))
+	}
 }

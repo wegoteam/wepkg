@@ -3,14 +3,14 @@ server:
 
 hertz:
   address: ":18080"
-  enable_pprof: true
-  enable_gzip: true
-  enable_access_log: true
-  log_level: info
-  log_file_name: "log/hertz.log"
-  log_max_size: 10
-  log_max_age: 3
-  log_max_backups: 50
+  enablePprof: true
+  enableGzip: true
+  enableAccessLog: true
+  logLevel: info
+  logFileName: "log/hertz.log"
+  logMaxSize: 10
+  logMaxAge: 3
+  logMaxBackups: 50
 
 mysql:
   host: "127.0.0.1"

@@ -15,7 +15,7 @@ type MySQL struct {
 // Redis
 // @Description: redis配置
 type Redis struct {
-	Addr     string `yaml:"addr" json:"addr"`
+	Address  string `yaml:"address" json:"address"`
 	Username string `yaml:"username" json:"username"`
 	Password string `yaml:"password" json:"password"`
 	DB       int    `yaml:"db" json:"db"`
@@ -25,12 +25,20 @@ type Redis struct {
 // @Description: Hertz配置
 type Hertz struct {
 	Address         string `yaml:"address" json:"address"`
-	EnablePprof     bool   `yaml:"enable_pprof" json:"enablePprof"`
-	EnableGzip      bool   `yaml:"enable_gzip" json:"enableGzip"`
-	EnableAccessLog bool   `yaml:"enable_access_log "json:"enableAccessLog"`
-	LogLevel        string `yaml:"log_level" json:"logLevel"`
-	LogFileName     string `yaml:"log_file_name" json:"logFileName"`
-	LogMaxSize      int    `yaml:"log_max_size" json:"logMaxSize"`
-	LogMaxBackups   int    `yaml:"log_max_backups" json:"logMaxBackups"`
-	LogMaxAge       int    `yaml:"log_max_age" json:"logMaxAge"`
+	EnablePprof     bool   `yaml:"enablePprof" json:"enablePprof"`
+	EnableGzip      bool   `yaml:"enableGzip" json:"enableGzip"`
+	EnableAccessLog bool   `yaml:"enableAccessLog "json:"enableAccessLog"`
+	LogLevel        string `yaml:"logLevel" json:"logLevel"`
+	LogFileName     string `yaml:"logFileName" json:"logFileName"`
+	LogMaxSize      int    `yaml:"logMaxSize" json:"logMaxSize"`
+	LogMaxBackups   int    `yaml:"logMaxBackups" json:"logMaxBackups"`
+	LogMaxAge       int    `yaml:"logMaxAge" json:"logMaxAge"`
+}
+
+// Mongo
+// @Description: Mongo配置
+type Mongo struct {
+	Address  string `yaml:"address" json:"address"`
+	Username string `yaml:"username" json:"username"`
+	Password string `yaml:"password" json:"password"`
 }
