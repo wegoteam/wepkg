@@ -96,3 +96,8 @@ func TestSnowflakeId(t *testing.T) {
 
 ```
 
+贡献来源：
+
+https://github.com/spf13/viper
+
+https://github.com/redis/go-redis
