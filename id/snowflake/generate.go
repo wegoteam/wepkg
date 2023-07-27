@@ -1,6 +1,33 @@
 package snowflake
 
-import "strconv"
+import (
+	"strconv"
+	"sync"
+)
+
+var once sync.Once
+
+// init
+// @Description: 初始化
+func init() {
+	once.Do(func() {
+		snowflake, err := initSnowflake()
+		if err != nil {
+			return
+		}
+		var options = &SnowflakeOptions{
+			Method:            uint16(snowflake.Method),
+			WorkerId:          uint16(snowflake.WorkerId),
+			BaseTime:          snowflake.BaseTime,
+			WorkerIdBitLength: snowflake.BitLength,
+			SeqBitLength:      snowflake.SeqBitLength,
+			MaxSeqNumber:      0,
+			MinSeqNumber:      5,
+			TopOverCostCount:  2000,
+		}
+		SetSnowflakeOptions(options)
+	})
+}
 
 // GenSnowflakeId 获取雪花算法ID
 func GenSnowflakeId() int64 {

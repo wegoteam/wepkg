@@ -40,6 +40,30 @@ go get -u github.com/wegoteam/wepkg@latest
 
 ### config
 加载配置：默认加载环境变量、配置文件、命令行参数
+- 默认配置文件加载顺序：命令行参数  > 默认配置文件目录(./config/config.yaml) 
+    ```shell
+    go run main.go --config=../config/config.yaml
+    ```
+    ```go
+  c := config.GetConfig()
+  var mysql = &MySQL{}
+  err := c.Load("mysql", mysql)
+  if err != nil {
+      fmt.Errorf("Fatal error config file: %s \n", err)
+  }
+  fmt.Printf("mysql prop=%+v \n", mysql)
+    ```
+- 加载指定位置配置文件
+    ```go
+  c := config.NewConfig("config", "yaml", "", []string{"."})
+  var mysql = &MySQL{}
+  err := c.Load("mysql", mysql)
+  if err != nil {
+      fmt.Errorf("Fatal error config file: %s \n", err)
+  }
+  fmt.Printf("mysql prop=%+v \n", mysql)
+    ```
+
 
 
 ### crypto
@@ -265,6 +289,22 @@ func TestSetFieldVal(t *testing.T) {
 
 ### id
 #### snowflake
+- 雪花算法配置读取./config/config.yaml文件的配置
+```yaml
+#雪花算法配置
+snowflake:
+  #雪花计算方法,（1-漂移算法|2-传统算法），默认1
+  method: 1
+  #基础时间（ms单位），不能超过当前系统时间
+  baseTime: 1582136402000
+  #机器码，必须由外部设定，最大值 2^WorkerIdBitLength-1
+  workerId: 1
+  #机器码位长，默认值6，取值范围 [1, 15]（要求：序列数位长+机器码位长不超过22）
+  bitLength: 6
+  #序列数位长，默认值6，取值范围 [3, 21]（要求：序列数位长+机器码位长不超过22）
+  seqBitLength: 6
+```
+- 设置NewSnowflakeOptions方法的参数配置雪花算法
 ```go
 /**
 Method：雪花计算方法,（1-漂移算法|2-传统算法），默认1
@@ -293,6 +333,11 @@ func TestSnowflake(t *testing.T) {
 		time.Sleep(time.Second)
 	}
 }
+
+```
+
+使用方法
+```go
 /**
   使用默认配置生成
 */
@@ -306,8 +351,8 @@ func TestSnowflakeId(t *testing.T) {
     newId := GenSnowflakeId()
     fmt.Println(newId)
 }
-
 ```
+
 #### uuid/ulid
 ```go
 func TestUUID(t *testing.T) {

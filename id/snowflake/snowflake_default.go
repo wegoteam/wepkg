@@ -5,12 +5,18 @@ import (
 	"time"
 )
 
+// DefaultSnowflake
+// @Description: 雪花算法
 type DefaultSnowflake struct {
 	Options            *SnowflakeOptions
 	SnowWorker         ISnowflake
 	SnowflakeException SnowflakeException
 }
 
+// NewDefaultSnowflake
+// @Description: 创建雪花算法
+// @param: options
+// @return *DefaultSnowflake
 func NewDefaultSnowflake(options *SnowflakeOptions) *DefaultSnowflake {
 	if options == nil {
 		panic("dig.Options error.")
@@ -83,10 +89,19 @@ func NewDefaultSnowflake(options *SnowflakeOptions) *DefaultSnowflake {
 	}
 }
 
+// NewNextId
+// @Description: 生成下一个ID
+// @receiver: snowflake
+// @return int64
 func (snowflake *DefaultSnowflake) NewNextId() int64 {
 	return snowflake.SnowWorker.NextId()
 }
 
+// ExtractTime
+// @Description: 从ID中提取时间
+// @receiver: snowflake
+// @param: id
+// @return time.Time
 func (snowflake *DefaultSnowflake) ExtractTime(id int64) time.Time {
 	return time.UnixMilli(id>>(snowflake.Options.WorkerIdBitLength+snowflake.Options.SeqBitLength) + snowflake.Options.BaseTime)
 }

@@ -7,38 +7,44 @@ import (
 	"time"
 )
 
+// ISnowflake
+// @Description: 雪花算法接口
 type ISnowflake interface {
 	NextId() int64
 }
 
-// SnowWorkerM1 .
+// SnowWorkerM1
+// @Description: 雪花算法
 type SnowWorkerM1 struct {
-	BaseTime          int64  // 基础时间
-	WorkerId          uint16 // 机器码
-	WorkerIdBitLength byte   // 机器码位长
-	SeqBitLength      byte   // 自增序列数位长
-	MaxSeqNumber      uint32 // 最大序列数（含）
-	MinSeqNumber      uint32 // 最小序列数（含）
-	TopOverCostCount  uint32 // 最大漂移次数
-	TimestampShift    byte
-	CurrentSeqNumber  uint32
-
-	LastTimeTick           int64
-	TurnBackTimeTick       int64
-	TurnBackIndex          byte
-	IsOverCost             bool
-	OverCostCountInOneTerm uint32
-	// GenCountInOneTerm      uint32
-	// TermIndex              uint32
-
+	BaseTime               int64  // 基础时间
+	WorkerId               uint16 // 机器码
+	WorkerIdBitLength      byte   // 机器码位长
+	SeqBitLength           byte   // 自增序列数位长
+	MaxSeqNumber           uint32 // 最大序列数（含）
+	MinSeqNumber           uint32 // 最小序列数（含）
+	TopOverCostCount       uint32 // 最大漂移次数
+	TimestampShift         byte   // 时间戳左偏移位数
+	CurrentSeqNumber       uint32 // 当前序列数
+	LastTimeTick           int64  // 上次时间戳
+	TurnBackTimeTick       int64  // 回拨时间戳
+	TurnBackIndex          byte   // 回拨次数
+	IsOverCost             bool   // 是否漂移过
+	OverCostCountInOneTerm uint32 // 漂移次数
+	//GenCountInOneTerm      uint32 // 本轮生成数量
+	//TermIndex              uint32 // 本轮索引
 	sync.Mutex
 }
 
+// SnowWorkerM2
+// @Description: 雪花算法
 type SnowWorkerM2 struct {
 	*SnowWorkerM1
 }
 
-// NewSnowWorkerM1 .
+// NewSnowWorkerM1
+// @Description: 创建雪花算法
+// @param: options
+// @return ISnowflake
 func NewSnowWorkerM1(options *SnowflakeOptions) ISnowflake {
 	var workerIdBitLength byte
 	var seqBitLength byte
@@ -110,29 +116,52 @@ func NewSnowWorkerM1(options *SnowflakeOptions) ISnowflake {
 	}
 }
 
-// DoGenIDAction .
+// GetSnowWorkerAction
+// @Description: 获取漂移动作
+// @receiver: m1
+// @param: arg
 func (m1 *SnowWorkerM1) GetSnowWorkerAction(arg *OverCostAction) {
 
 }
 
+// BeginOverCostAction
+// @Description: 开始漂移动作
+// @receiver: m1
+// @param: useTimeTick
 func (m1 *SnowWorkerM1) BeginOverCostAction(useTimeTick int64) {
 
 }
 
+// EndOverCostAction
+// @Description: 结束漂移动作
+// @receiver: m1
+// @param: useTimeTick
 func (m1 *SnowWorkerM1) EndOverCostAction(useTimeTick int64) {
 	// if m1._TermIndex > 10000 {
 	// 	m1._TermIndex = 0
 	// }
 }
 
+// BeginTurnBackAction
+// @Description: 开始回拨动作
+// @receiver: m1
+// @param: useTimeTick
 func (m1 *SnowWorkerM1) BeginTurnBackAction(useTimeTick int64) {
 
 }
 
+// EndTurnBackAction
+// @Description: 结束回拨动作
+// @receiver: m1
+// @param: useTimeTick
 func (m1 *SnowWorkerM1) EndTurnBackAction(useTimeTick int64) {
 
 }
 
+// NextOverCostId
+// @Description: 获取下一个漂移ID
+// @receiver: m1
+// @return int64
 func (m1 *SnowWorkerM1) NextOverCostId() int64 {
 	currentTimeTick := m1.GetCurrentTimeTick()
 	if currentTimeTick > m1.LastTimeTick {
@@ -167,7 +196,10 @@ func (m1 *SnowWorkerM1) NextOverCostId() int64 {
 	return m1.CalcId(m1.LastTimeTick)
 }
 
-// NextNormalID .
+// NextNormalId
+// @Description: 获取下一个正常ID
+// @receiver: m1
+// @return int64
 func (m1 *SnowWorkerM1) NextNormalId() int64 {
 	currentTimeTick := m1.GetCurrentTimeTick()
 	if currentTimeTick < m1.LastTimeTick {
@@ -213,27 +245,41 @@ func (m1 *SnowWorkerM1) NextNormalId() int64 {
 	return m1.CalcId(m1.LastTimeTick)
 }
 
-// CalcID .
+// CalcId
+// @Description: 计算ID
+// @receiver: m1
+// @param: useTimeTick
+// @return int64
 func (m1 *SnowWorkerM1) CalcId(useTimeTick int64) int64 {
 	result := int64(useTimeTick<<m1.TimestampShift) + int64(m1.WorkerId<<m1.SeqBitLength) + int64(m1.CurrentSeqNumber)
 	m1.CurrentSeqNumber++
 	return result
 }
 
-// CalcTurnBackID .
+// CalcTurnBackId
+// @Description: 计算回拨ID
+// @receiver: m1
+// @param: useTimeTick
+// @return int64
 func (m1 *SnowWorkerM1) CalcTurnBackId(useTimeTick int64) int64 {
 	result := int64(useTimeTick<<m1.TimestampShift) + int64(m1.WorkerId<<m1.SeqBitLength) + int64(m1.TurnBackIndex)
 	m1.TurnBackTimeTick--
 	return result
 }
 
-// GetCurrentTimeTick .
+// GetCurrentTimeTick
+// @Description: 获取当前时间戳
+// @receiver: m1
+// @return int64
 func (m1 *SnowWorkerM1) GetCurrentTimeTick() int64 {
 	var millis = time.Now().UnixNano() / 1e6
 	return millis - m1.BaseTime
 }
 
-// GetNextTimeTick .
+// GetNextTimeTick
+// @Description: 获取下一个时间戳
+// @receiver: m1
+// @return int64
 func (m1 *SnowWorkerM1) GetNextTimeTick() int64 {
 	tempTimeTicker := m1.GetCurrentTimeTick()
 	for tempTimeTicker <= m1.LastTimeTick {
@@ -243,7 +289,10 @@ func (m1 *SnowWorkerM1) GetNextTimeTick() int64 {
 	return tempTimeTicker
 }
 
-// GenSnowflakeId .
+// NextId
+// @Description: 获取下一个ID
+// @receiver: m1
+// @return int64
 func (m1 *SnowWorkerM1) NextId() int64 {
 	m1.Lock()
 	defer m1.Unlock()
@@ -260,6 +309,10 @@ func NewSnowWorkerM2(options *SnowflakeOptions) ISnowflake {
 	}
 }
 
+// NextId
+// @Description: 获取下一个ID
+// @receiver: m2
+// @return int64
 func (m2 SnowWorkerM2) NextId() int64 {
 	m2.Lock()
 	defer m2.Unlock()

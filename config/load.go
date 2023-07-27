@@ -22,7 +22,6 @@ var (
 	once       sync.Once
 	systemProp = make(map[string]interface{})
 	config     *Config
-	isLoad     = false
 )
 
 // Config
@@ -33,6 +32,7 @@ type Config struct {
 	Type     string            // 配置文件类型
 	Path     []string          // 配置文件路径
 	Profiles string            // 配置文件环境
+	IsLoad   bool              // 是否加载
 }
 
 // init
@@ -66,13 +66,13 @@ func SetConfig(configName, configType, profiles string, confPaths []string) *Con
 		c.AddConfigPath(path)
 		fmt.Printf("set config AddConfigPath %s \n", path)
 	}
-	isLoad = false
 	config = &Config{
 		Config:   c,
 		Name:     configName,
 		Type:     configType,
 		Path:     confPaths,
 		Profiles: profiles,
+		IsLoad:   false,
 	}
 	return config
 }
@@ -94,13 +94,13 @@ func NewConfig(configName, configType, profiles string, confPaths []string) *Con
 		c.AddConfigPath(path)
 		fmt.Printf("new config AddConfigPath %s \n", path)
 	}
-	isLoad = false
 	return &Config{
 		Config:   c,
 		Name:     configName,
 		Type:     configType,
 		Path:     confPaths,
 		Profiles: profiles,
+		IsLoad:   false,
 	}
 }
 
@@ -138,6 +138,7 @@ func initConfig() {
 		Type:     fileType,
 		Path:     confPathList,
 		Profiles: profiles,
+		IsLoad:   false,
 	}
 }
 
@@ -172,14 +173,14 @@ func parseFilePath(files string) (paths, fileName, fileType string) {
 func (config *Config) Load(prefix string, data interface{}) error {
 	c := config.Config
 	// 搜索并读取配置文件
-	if !isLoad {
+	if !config.IsLoad {
 		readErr := c.ReadInConfig()
 		readErr = c.MergeInConfig()
 		if readErr != nil {
 			fmt.Errorf("fatal error config file: %s \n", readErr)
 			return errors.New("fatal error config file")
 		}
-		isLoad = true
+		config.IsLoad = true
 	}
 	// 解析
 	parseErr := c.UnmarshalKey(prefix, &data)
