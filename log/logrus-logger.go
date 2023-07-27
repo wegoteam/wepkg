@@ -42,21 +42,21 @@ func (l *LogrusLogger) Fatalf(msg string, field ...interface{}) {
 	panic("implement me")
 }
 
-func (l *LogrusLogger) Debug(msg string, fields map[string]interface{}) {
+func (l *LogrusLogger) Debug(field ...interface{}) {
 
-	l.logger.WithFields(fields).Debug(msg)
-}
-
-func (l *LogrusLogger) Info(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Info(msg)
+	l.logger.Debug(field)
 }
 
-func (l *LogrusLogger) Warn(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Warn(msg)
+func (l *LogrusLogger) Info(field ...interface{}) {
+	l.logger.Info(field)
 }
-func (l *LogrusLogger) Error(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Error(msg)
+
+func (l *LogrusLogger) Warn(field ...interface{}) {
+	l.logger.Warn(field)
 }
-func (l *LogrusLogger) Fatal(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Fatal(msg)
+func (l *LogrusLogger) Error(field ...interface{}) {
+	l.logger.Error(field)
+}
+func (l *LogrusLogger) Fatal(field ...interface{}) {
+	l.logger.Fatal(field)
 }

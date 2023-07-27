@@ -1,0 +1,57 @@
+package example
+
+import (
+	"fmt"
+	"github.com/wegoteam/wepkg/datetime"
+	"testing"
+	"time"
+)
+
+func TestTime(t *testing.T) {
+	fmt.Printf("当前时间：%v \n", datetime.Now())
+	fmt.Printf("当前时间戳：%v \n", datetime.Timestamp())
+	fmt.Printf("当前时间戳：%v \n", time.Now().Unix())
+	fmt.Printf("当前毫秒级时间戳：%v \n", datetime.TimestampMilli())
+	fmt.Printf("当前毫秒级时间戳：%v \n", time.Now().UnixNano())
+	fmt.Printf("当前微秒级时间戳：%v \n", datetime.TimestampMicro())
+	fmt.Printf("当前纳秒级时间戳：%v \n", datetime.TimestampNano())
+	fmt.Printf("昨天时间：%v \n", datetime.Yesterday())
+	fmt.Printf("明天时间：%v \n", datetime.Tomorrow())
+	fmt.Printf("字符串转time：%v \n", datetime.Parse("2023-07-22 13:14:15"))
+	fmt.Printf("当前时间转字符串：%v \n", datetime.ToString(time.Now()))
+	fmt.Printf("当前时间转正则字符串：%v \n", datetime.Format(time.Now(), "Y-m-d H:i:s.U"))
+	fmt.Printf("当前时间转正则字符串：%v \n", datetime.Layout(time.Now(), "2006-01-02 15:04:05.999"))
+	fmt.Printf("当前时间改变年数：%v \n", datetime.ChangeYears(time.Now(), 1))
+	fmt.Printf("当前时间改变年数：%v \n", datetime.ChangeYears(time.Now(), -1))
+	fmt.Printf("当前时间改变月数：%v \n", datetime.ChangeMonths(time.Now(), 1))
+	fmt.Printf("当前时间改变月数：%v \n", datetime.ChangeMonths(time.Now(), -1))
+	fmt.Printf("当前时间改变天数：%v \n", datetime.ChangeDays(time.Now(), 1))
+	fmt.Printf("当前时间改变天数：%v \n", datetime.ChangeDays(time.Now(), -1))
+	fmt.Printf("当前时间改变小时：%v \n", datetime.ChangeHours(time.Now(), 1))
+	fmt.Printf("当前时间改变小时：%v \n", datetime.ChangeHours(time.Now(), -1))
+	fmt.Printf("当前时间改变分钟：%v \n", datetime.ChangeMinutes(time.Now(), 1))
+	fmt.Printf("当前时间改变分钟：%v \n", datetime.ChangeMinutes(time.Now(), -1))
+	fmt.Printf("当前时间改变秒数：%v \n", datetime.ChangeSeconds(time.Now(), 1))
+	fmt.Printf("当前时间改变秒数：%v \n", datetime.ChangeSeconds(time.Now(), -1))
+	fmt.Printf("当前时间改变毫秒数：%v \n", datetime.ChangeMilliseconds(time.Now(), 1))
+	fmt.Printf("当前时间改变毫秒数：%v \n", datetime.ChangeMilliseconds(time.Now(), -1))
+	fmt.Printf("两个时间相差的年数：%v \n", datetime.DiffYear(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的年数：%v \n", datetime.DiffAbsYear(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的月数：%v \n", datetime.DiffMonth(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的月数：%v \n", datetime.DiffAbsMonth(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的周数：%v \n", datetime.DiffWeek(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的周数：%v \n", datetime.DiffAbsWeek(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的天数：%v \n", datetime.DiffDay(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的天数：%v \n", datetime.DiffAbsDay(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的小时：%v \n", datetime.DiffHour(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的小时：%v \n", datetime.DiffAbsHour(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的分钟：%v \n", datetime.DiffMinute(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的分钟：%v \n", datetime.DiffAbsMinute(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的秒数：%v \n", datetime.DiffSecond(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("两个时间相差的秒数：%v \n", datetime.DiffAbsSecond(time.Now(), datetime.Parse("2023-07-22 13:14:15")))
+	fmt.Printf("时间转换时间戳：%v \n", datetime.ToTimestamp(time.Now()))
+	fmt.Printf("时间转换毫秒级时间戳：%v \n", datetime.ToTimestampMilli(time.Now()))
+	fmt.Printf("时间转换微秒级时间戳：%v \n", datetime.ToTimestampMicro(time.Now()))
+	fmt.Printf("时间转换纳秒级时间戳：%v \n", datetime.ToTimestampNano(time.Now()))
+	fmt.Printf("判断时间是否有效：%v \n", datetime.IsEffective("0"))
+}

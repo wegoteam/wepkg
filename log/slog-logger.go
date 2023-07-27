@@ -43,21 +43,20 @@ func (l *SlogLogger) Fatalf(msg string, field ...interface{}) {
 	panic("implement me")
 }
 
-func (l *SlogLogger) Debug(msg string, fields map[string]interface{}) {
-	slog.Debug()
-	l.logger.WithFields(fields).Debug(msg)
+func (l *SlogLogger) Debug(field ...interface{}) {
+	slog.Debug(field)
 }
 
-func (l *SlogLogger) Info(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Info(msg)
+func (l *SlogLogger) Info(field ...interface{}) {
+	slog.Info(field)
 }
 
-func (l *SlogLogger) Warn(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Warn(msg)
+func (l *SlogLogger) Warn(field ...interface{}) {
+	slog.Warn(field)
 }
-func (l *SlogLogger) Error(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Error(msg)
+func (l *SlogLogger) Error(field ...interface{}) {
+	slog.Error(field)
 }
-func (l *SlogLogger) Fatal(msg string, fields map[string]interface{}) {
-	l.logger.WithFields(fields).Fatal(msg)
+func (l *SlogLogger) Fatal(field ...interface{}) {
+	slog.Fatal(field)
 }

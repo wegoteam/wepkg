@@ -1,5 +1,5 @@
 // Package config 为您执行以下操作：
-//查找、加载和解组 JSON、TOML、YAML、HCL、INI、envfile 或 Java 属性格式的配置文件。
+//查找、加载和解组 JSON、TOML、YAML、YML、HCL、INI、envfile 或 Java 属性格式的配置文件。
 //提供一种机制来为不同的配置选项设置默认值。
 //提供一种机制来为通过命令行标志指定的选项设置覆盖值。
 //提供别名系统以轻松重命名参数而不破坏现有代码。
@@ -12,6 +12,8 @@ import (
 	"fmt"
 	flagUtil "github.com/spf13/pflag"
 	configUtil "github.com/spf13/viper"
+	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -20,7 +22,6 @@ var (
 	once       sync.Once
 	systemProp = make(map[string]interface{})
 	config     *Config
-	isLoad     = false
 )
 
 // Config
@@ -31,6 +32,7 @@ type Config struct {
 	Type     string            // 配置文件类型
 	Path     []string          // 配置文件路径
 	Profiles string            // 配置文件环境
+	IsLoad   bool              // 是否加载
 }
 
 // init
@@ -59,18 +61,18 @@ func SetConfig(configName, configType, profiles string, confPaths []string) *Con
 	c.SetConfigName(configName)
 	c.SetConfigType(configType)
 	c.SetEnvPrefix(profiles)
-	fmt.Printf("set config AddDefault ConfigName=%s,ConfigType=%s, \n", configName, configType)
+	fmt.Printf("set config AddDefault ConfigName=%s,ConfigType=%s \n", configName, configType)
 	for _, path := range confPaths {
 		c.AddConfigPath(path)
 		fmt.Printf("set config AddConfigPath %s \n", path)
 	}
-	isLoad = false
 	config = &Config{
 		Config:   c,
 		Name:     configName,
 		Type:     configType,
 		Path:     confPaths,
 		Profiles: profiles,
+		IsLoad:   false,
 	}
 	return config
 }
@@ -87,18 +89,18 @@ func NewConfig(configName, configType, profiles string, confPaths []string) *Con
 	c.SetConfigName(configName)
 	c.SetConfigType(configType)
 	c.SetEnvPrefix(profiles)
-	fmt.Printf("new config AddDefault ConfigName=%s,ConfigType=%s, \n", configName, configType)
+	fmt.Printf("new config AddDefault ConfigName=%s,ConfigType=%s \n", configName, configType)
 	for _, path := range confPaths {
 		c.AddConfigPath(path)
 		fmt.Printf("new config AddConfigPath %s \n", path)
 	}
-	isLoad = false
 	return &Config{
 		Config:   c,
 		Name:     configName,
 		Type:     configType,
 		Path:     confPaths,
 		Profiles: profiles,
+		IsLoad:   false,
 	}
 }
 
@@ -117,36 +119,50 @@ func initConfig() {
 	flagUtil.Parse()
 	flagUtil.Visit(func(f *flagUtil.Flag) {
 		systemProp[f.Name] = f.Value
+		fmt.Printf("initConfig flag name=%s,value=%s \n", f.Name, f.Value)
 	})
 	c := configUtil.New()
 	// 配置文件的文件名，没有扩展名，如 .yaml, .toml 这样的扩展名
 	// 设置扩展名。在这里设置文件的扩展名。另外，如果配置文件的名称没有扩展名，则需要配置这个选项
-	c.SetConfigName("config")
-	c.SetConfigType("yaml")
-	fmt.Printf("initConfig AddDefault ConfigName=%s,ConfigType=%s, \n", "./config", "yaml")
+	paths, fileName, fileType := parseFilePath(configPath)
+	c.SetConfigName(fileName)
+	c.SetConfigType(fileType)
 	var confPathList = make([]string, 0)
-	_, ok := systemProp["config"]
-	if ok {
-		if configPath != "" {
-			paths := strings.Split(configPath, ",")
-			for _, path := range paths {
-				c.AddConfigPath(path)
-				fmt.Printf("initConfig AddConfigPath %s \n", path)
-			}
-			confPathList = append(confPathList, paths...)
-		}
-	} else {
-		c.AddConfigPath("./config")
-		fmt.Printf("initConfig AddConfigPath %s \n", "./config")
-		confPathList = append(confPathList, "./config")
-	}
+	confPathList = append(confPathList, paths)
+	fmt.Printf("initConfig AddDefault ConfigName=%s,ConfigType=%s \n", fileName, fileType)
+	c.AddConfigPath(paths)
+	fmt.Printf("initConfig AddConfigPath %s \n", paths)
 	config = &Config{
 		Config:   c,
-		Name:     "config",
-		Type:     "yaml",
+		Name:     fileName,
+		Type:     fileType,
 		Path:     confPathList,
 		Profiles: profiles,
+		IsLoad:   false,
 	}
+}
+
+// parseFilePath
+// @Description: 解析文件路径
+// @param: files 文件路径
+// @return paths 文件路径
+// @return fileName 文件名称
+// @return fileType 文件类型
+func parseFilePath(files string) (paths, fileName, fileType string) {
+	if files == "" || files == "." {
+		return "./", "config", ""
+	}
+	paths, fileName = filepath.Split(files)
+	if paths == "" {
+		paths = "./"
+	}
+	fileType = path.Ext(files)
+	fileName = strings.TrimSuffix(fileName, fileType)
+	fileType = strings.TrimPrefix(fileType, ".")
+	if fileName == "" && fileType == "" {
+		fileName = "config"
+	}
+	return
 }
 
 // Load
@@ -157,13 +173,14 @@ func initConfig() {
 func (config *Config) Load(prefix string, data interface{}) error {
 	c := config.Config
 	// 搜索并读取配置文件
-	if !isLoad {
+	if !config.IsLoad {
 		readErr := c.ReadInConfig()
+		readErr = c.MergeInConfig()
 		if readErr != nil {
 			fmt.Errorf("fatal error config file: %s \n", readErr)
 			return errors.New("fatal error config file")
 		}
-		isLoad = true
+		config.IsLoad = true
 	}
 	// 解析
 	parseErr := c.UnmarshalKey(prefix, &data)
@@ -183,6 +200,7 @@ func (config *Config) Load(prefix string, data interface{}) error {
 func Read(config *Config) error {
 	c := config.Config
 	readErr := c.ReadInConfig()
+	readErr = c.MergeInConfig()
 	if readErr != nil {
 		fmt.Errorf("fatal error config file: %s \n", readErr)
 		return errors.New("fatal error config file")
