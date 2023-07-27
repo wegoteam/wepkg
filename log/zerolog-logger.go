@@ -43,20 +43,16 @@ func (l *ZeroLogger) Fatalf(msg string, field ...interface{}) {
 	panic("implement me")
 }
 
-func (l *ZeroLogger) Debug(msg string, fields map[string]interface{}) {
-	l.logger.Debug().Fields(fields).Msg(msg)
+func (l *ZeroLogger) Debug(field ...interface{}) {
+	l.logger.Debug().Msg("")
 }
 
-func (l *ZeroLogger) Info(msg string, fields map[string]interface{}) {
-	l.logger.Info().Fields(fields).Msg(msg)
+func (l *ZeroLogger) Info(field ...interface{}) {
 }
 
-func (l *ZeroLogger) Warn(msg string, fields map[string]interface{}) {
-	l.logger.Warn().Fields(fields).Msg(msg)
+func (l *ZeroLogger) Warn(field ...interface{}) {
 }
-func (l *ZeroLogger) Error(msg string, fields map[string]interface{}) {
-	l.logger.Error().Fields(fields).Msg(msg)
+func (l *ZeroLogger) Error(field ...interface{}) {
 }
-func (l *ZeroLogger) Fatal(msg string, fields map[string]interface{}) {
-	l.logger.Fatal().Fields(fields).Msg(msg)
+func (l *ZeroLogger) Fatal(field ...interface{}) {
 }

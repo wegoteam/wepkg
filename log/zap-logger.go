@@ -40,20 +40,20 @@ func (l *ZapLogger) Fatalf(msg string, field ...interface{}) {
 	panic("implement me")
 }
 
-func (l *ZapLogger) Debug(msg string, fields map[string]interface{}) {
-	l.logger.Debug(msg, zap.Any("args", fields))
+func (l *ZapLogger) Debug(field ...interface{}) {
+	l.logger.Debug("", zap.Any("args", field))
 }
 
-func (l *ZapLogger) Info(msg string, fields map[string]interface{}) {
-	l.logger.Info(msg, zap.Any("args", fields))
+func (l *ZapLogger) Info(field ...interface{}) {
+	l.logger.Info("", zap.Any("args", field))
 }
 
-func (l *ZapLogger) Warn(msg string, fields map[string]interface{}) {
-	l.logger.Warn(msg, zap.Any("args", fields))
+func (l *ZapLogger) Warn(field ...interface{}) {
+	l.logger.Warn("", zap.Any("args", field))
 }
-func (l *ZapLogger) Error(msg string, fields map[string]interface{}) {
-	l.logger.Error(msg, zap.Any("args", fields))
+func (l *ZapLogger) Error(field ...interface{}) {
+	l.logger.Error("", zap.Any("args", field))
 }
-func (l *ZapLogger) Fatal(msg string, fields map[string]interface{}) {
-	l.logger.Fatal(msg, zap.Any("args", fields))
+func (l *ZapLogger) Fatal(field ...interface{}) {
+	l.logger.Fatal("", zap.Any("args", field))
 }

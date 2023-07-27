@@ -1,7 +1,8 @@
-package snowflake
+package example
 
 import (
 	"fmt"
+	"github.com/wegoteam/wepkg/id/snowflake"
 	"testing"
 	"time"
 )
@@ -18,19 +19,19 @@ import (
 */
 func TestSnowflake(t *testing.T) {
 	// 创建对象，可在构造函数中输入 WorkerId：
-	var options = NewSnowflakeOptions(1)
+	var options = snowflake.NewSnowflakeOptions(1)
 	options.Method = 1
 	options.WorkerIdBitLength = 6
 	options.SeqBitLength = 6
 	// 保存参数（务必调用，否则参数设置不生效）：
-	SetSnowflakeOptions(options)
+	snowflake.SetSnowflakeOptions(options)
 
 	// 以上过程只需全局一次，且应在生成ID之前完成。
 
 	// 初始化后，在任何需要生成ID的地方，调用以下方法：
 
 	for {
-		var newId = GenSnowflakeId()
+		var newId = snowflake.GenSnowflakeId()
 		fmt.Println(newId)
 		time.Sleep(time.Second)
 	}
@@ -41,11 +42,11 @@ func TestSnowflake(t *testing.T) {
 */
 func TestSnowflakeId(t *testing.T) {
 	//返回字符串雪花算法ID
-	var newStrId = GetSnowflakeId()
+	var newStrId = snowflake.GetSnowflakeId()
 
 	fmt.Println(newStrId)
 
 	//返回int64雪花算法ID
-	newId := GenSnowflakeId()
+	newId := snowflake.GenSnowflakeId()
 	fmt.Println(newId)
 }

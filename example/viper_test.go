@@ -1,10 +1,14 @@
-package config
+package example
 
 import (
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
+	configUtil "github.com/wegoteam/wepkg/config"
+	"path"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -35,8 +39,8 @@ func TestViper(t *testing.T) {
 		//}
 		fmt.Errorf("Fatal error config file: %s \n", err)
 	}
-	var mysql = &MySQL{}
-	var hertz = &Hertz{}
+	var mysql = &configUtil.MySQL{}
+	var hertz = &configUtil.Hertz{}
 	err = viper.UnmarshalKey("hertz", hertz)
 	err = viper.UnmarshalKey("mysql", mysql)
 	if err != nil {
@@ -73,6 +77,23 @@ func TestPath(t *testing.T) {
 	fmt.Println("文件扩展名=", fileType)
 }
 
+func parseFilePath(files string) (paths, fileName, fileType string) {
+	if files == "" || files == "." {
+		return "./", "config", ""
+	}
+	paths, fileName = filepath.Split(files)
+	if paths == "" {
+		paths = "./"
+	}
+	fileType = path.Ext(files)
+	fileName = strings.TrimSuffix(fileName, fileType)
+	fileType = strings.TrimPrefix(fileType, ".")
+	if fileName == "" && fileType == "" {
+		fileName = "config"
+	}
+	return
+}
+
 func TestEnv(t *testing.T) {
 	viper := viper.New()
 
@@ -92,8 +113,8 @@ func TestEnv(t *testing.T) {
 		//}
 		fmt.Errorf("Fatal error config file: %s \n", err)
 	}
-	var mysql = &MySQL{}
-	var hertz = &Hertz{}
+	var mysql = &configUtil.MySQL{}
+	var hertz = &configUtil.Hertz{}
 	err = viper.UnmarshalKey("hertz", hertz)
 	err = viper.UnmarshalKey("mysql", mysql)
 	if err != nil {
