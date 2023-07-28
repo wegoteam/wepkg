@@ -403,7 +403,7 @@ snowflake:
   method: 1
   #基础时间（ms单位），不能超过当前系统时间
   baseTime: 1582136402000
-  #机器码，必须由外部设定，最大值 2^WorkerIdBitLength-1
+  #机器码，必须由外部设定，最大值 2^bitLength-1
   workerId: 1
   #机器码位长，默认值6，取值范围 [1, 15]（要求：序列数位长+机器码位长不超过22）
   bitLength: 6
