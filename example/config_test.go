@@ -8,7 +8,7 @@ import (
 
 func TestLoad(t *testing.T) {
 	config := configUtil.GetConfig()
-	config = configUtil.SetConfig("config", "yaml", "", []string{"."})
+	//config = configUtil.SetConfig("config", "yaml", "", []string{"."})
 	//config := NewConfig("config", "yaml", "", []string{"."})
 	var mysql = &configUtil.MySQL{}
 	err := config.Load("mysql", mysql)

@@ -8,11 +8,26 @@ type Response struct {
 	Data interface{} `json:"data"` // 数据
 }
 
+// Result
+// @Description: 响应体
+type Result[T any] struct {
+	Code int    `json:"code"` // 0:成功，其他：失败
+	Msg  string `json:"msg"`  // 错误信息
+	Data T      `json:"data"` // 数据
+}
+
 // NewResponse
 // @Description: 创建响应体
 // @return *Response
 func NewResponse() *Response {
 	return &Response{}
+}
+
+// NewResult
+// @Description: 创建响应体
+// @return *Result[T]
+func NewResult[T any]() *Result[T] {
+	return &Result[T]{}
 }
 
 // Fail

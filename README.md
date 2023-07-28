@@ -35,8 +35,114 @@ go get -u github.com/wegoteam/wepkg@latest
 - 响应结构体
 - 分页
 
-### net/http
+### net
+- http client的封装（get post put...）
+- rpc
+- websocket
+- tcp
+- udp
+- grpc
+- mqtt
+- nats
+#### net/http
 封装http请求的客户端
+
+```go
+func TestDefaultClientPOST(t *testing.T) {
+	client := http.BuildDefaultClient()
+	var res string
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(`{"roleName":""}`).
+		SetResult(res).
+		Post("http://localhost:18080/weflow/role/list")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", resp)
+	fmt.Println("Response Info:", res)
+}
+
+type Response[T any] struct {
+	Code int    `json:"code"` // 0:成功，其他：失败
+	Msg  string `json:"msg"`  // 错误信息
+	Data T      `json:"data"` // 数据
+}
+
+type RoleInfoResult struct {
+	ID         int64  `json:"id"`         // 唯一id
+	RoleID     string `json:"roleID"`     // 角色id
+	ParentID   string `json:"parentID"`   // 角色父id
+	RoleName   string `json:"roleName"`   // 角色名称
+	Status     int32  `json:"status"`     // 状态【1：未启用；2：已启用；3：锁定；】
+	Remark     string `json:"remark"`     // 描述
+	CreateUser string `json:"createUser"` // 创建人
+	UpdateUser string `json:"updateUser"` // 更新人
+	CreateTime string `json:"createTime"` // 创建时间
+	UpdateTime string `json:"updateTime"` // 更新时间
+}
+
+func TestGet(t *testing.T) {
+	res1, err := http.Get[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res1)
+
+	res2, err := http.GetString("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res2)
+}
+
+func TestPost(t *testing.T) {
+	type Role struct {
+		RoleName string `json:"roleName"`
+	}
+	var param = &Role{}
+	res1, err := http.Post[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list", param)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res1)
+
+	res2, err := http.PostString("http://localhost:18080/weflow/role/list", param)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res2)
+
+	res3, err := http.PostForm[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res3)
+
+	res4, err := http.PostFile[Response[any]]("http://localhost:18080/weflow/upload/file", "a.txt", "./testdata/a.txt")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res4)
+	
+	res5, err := http.PostFiles[Response[any]]("http://localhost:18080/weflow/upload/file", map[string]string{
+		"a.txt": "./testdata/a.txt",
+	})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res5)
+}
+```
 
 ### config
 加载配置：默认加载环境变量、配置文件、命令行参数
@@ -358,6 +464,60 @@ func TestSnowflakeId(t *testing.T) {
 func TestUUID(t *testing.T) {
 	fmt.Printf("uuid: %s\n", uuid.New())
 	fmt.Printf("ulid: %s\n", ulid.New())
+}
+```
+
+### io
+- 文件
+- json
+- yaml
+- toml
+- xml
+- csv
+- excel
+- doc
+- 压缩
+#### io/json
+json序列化和反序列化
+```go
+func TestFormat(t *testing.T) {
+	type Role struct {
+		RoleName string `json:"roleName"`
+	}
+	var param = &Role{
+		RoleName: "admin",
+	}
+	marshal, err := json.Marshal(param)
+	if err != nil {
+		fmt.Errorf("json.Marshal err: %v", err)
+	}
+	fmt.Println(marshal)
+
+	var role = &Role{}
+	err = json.Unmarshal(marshal, role)
+	if err != nil {
+		fmt.Errorf("json.Unmarshal err: %v", err)
+	}
+	fmt.Println(role)
+}
+```
+
+#### io/compress
+字符串压缩
+```go
+func TestCompress(t *testing.T) {
+	var dst []byte
+	var source = []byte("test")
+	encode := compress.Encode(dst, source)
+	fmt.Printf("encode:%s\n", encode)
+	fmt.Printf("dst encode:%s\n", dst)
+	var src []byte
+	decode, err := compress.Decode(encode, src)
+	if err != nil {
+		fmt.Errorf("err:%s\n", err.Error())
+	}
+	fmt.Printf("decode:%s\n", decode)
+	fmt.Printf("src decode:%s\n", src)
 }
 ```
 

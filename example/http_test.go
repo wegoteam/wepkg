@@ -2,121 +2,101 @@ package example
 
 import (
 	"fmt"
-	"github.com/go-resty/resty/v2"
-	"strconv"
+	"github.com/wegoteam/wepkg/net/http"
 	"testing"
-	"time"
 )
 
-func TestSimpleGet(t *testing.T) {
-	// Create a Resty Client
-	client := resty.New()
-
-	resp, err := client.R().
-		EnableTrace().
-		Get("https://httpbin.org/get")
-
-	// Explore response object
-	fmt.Println("Response Info:")
-	fmt.Println("  Error      :", err)
-	fmt.Println("  Status Code:", resp.StatusCode())
-	fmt.Println("  Status     :", resp.Status())
-	fmt.Println("  Proto      :", resp.Proto())
-	fmt.Println("  Time       :", resp.Time())
-	fmt.Println("  Received At:", resp.ReceivedAt())
-	fmt.Println("  Body       :\n", resp)
-	fmt.Println()
-
-	// Explore trace info
-	fmt.Println("request Trace Info:")
-	ti := resp.Request.TraceInfo()
-	fmt.Println("  DNSLookup     :", ti.DNSLookup)
-	fmt.Println("  ConnTime      :", ti.ConnTime)
-	fmt.Println("  TCPConnTime   :", ti.TCPConnTime)
-	fmt.Println("  TLSHandshake  :", ti.TLSHandshake)
-	fmt.Println("  ServerTime    :", ti.ServerTime)
-	fmt.Println("  ResponseTime  :", ti.ResponseTime)
-	fmt.Println("  TotalTime     :", ti.TotalTime)
-	fmt.Println("  IsConnReused  :", ti.IsConnReused)
-	fmt.Println("  IsConnWasIdle :", ti.IsConnWasIdle)
-	fmt.Println("  ConnIdleTime  :", ti.ConnIdleTime)
-	fmt.Println("  RequestAttempt:", ti.RequestAttempt)
-	fmt.Println("  RemoteAddr    :", ti.RemoteAddr.String())
-}
-
-func TestEnhancedGET(t *testing.T) {
-	// Create a Resty Client
-	client := resty.New()
-
-	resp, err := client.R().
-		SetQueryParams(map[string]string{
-			"page_no": "1",
-			"limit":   "20",
-			"sort":    "name",
-			"order":   "asc",
-			"random":  strconv.FormatInt(time.Now().Unix(), 10),
-		}).
-		SetHeader("Accept", "application/json").
-		SetAuthToken("BC594900518B4F7EAC75BD37F019E08FBC594900518B4F7EAC75BD37F019E08F").
-		Get("https://httpbin.org/search_result")
-	fmt.Println("Response Info:")
-	fmt.Println("  Error      :", err)
-	fmt.Println("  Status Code:", resp.StatusCode())
-	fmt.Println("  Status     :", resp.Status())
-	fmt.Println("  Proto      :", resp.Proto())
-	fmt.Println("  Time       :", resp.Time())
-	fmt.Println("  Received At:", resp.ReceivedAt())
-	fmt.Println("  Body       :\n", resp)
-	fmt.Println()
-
-	// Sample of using request.SetQueryString method
-	resp, err = client.R().
-		SetQueryString("productId=232&template=fresh-sample&cat=resty&source=google&kw=buy a lot more").
-		SetHeader("Accept", "application/json").
-		SetAuthToken("BC594900518B4F7EAC75BD37F019E08FBC594900518B4F7EAC75BD37F019E08F").
-		Get("https://httpbin.org/show_product")
-	fmt.Println("Response Info:")
-	fmt.Println("  Error      :", err)
-	fmt.Println("  Status Code:", resp.StatusCode())
-	fmt.Println("  Status     :", resp.Status())
-	fmt.Println("  Proto      :", resp.Proto())
-	fmt.Println("  Time       :", resp.Time())
-	fmt.Println("  Received At:", resp.ReceivedAt())
-	fmt.Println("  Body       :\n", resp)
-	fmt.Println()
-
-	var result string
-	// If necessary, you can force response content type to tell Resty to parse a JSON response into your struct
-	resp, err = client.R().
-		SetResult(result).
-		ForceContentType("application/json").
-		Get("https://httpbin.org/v2/alpine/manifests/latest")
-
-	fmt.Println("Response Info:")
-	fmt.Println("  Error      :", err)
-	fmt.Println("  Status Code:", resp.StatusCode())
-	fmt.Println("  Status     :", resp.Status())
-	fmt.Println("  Proto      :", resp.Proto())
-	fmt.Println("  Time       :", resp.Time())
-	fmt.Println("  Received At:", resp.ReceivedAt())
-	fmt.Println("  Body       :\n", resp)
-	fmt.Println()
-}
-
-func TestVariousPOST(t *testing.T) {
-	// Create a Resty Client
-	client := resty.New()
-
+func TestDefaultClientPOST(t *testing.T) {
+	client := http.BuildDefaultClient()
 	var res string
-	// POST JSON string
-	// No need to set content type, if you have client level setting
 	resp, err := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(`{"roleName":""}`).
-		SetResult(res). // or SetResult(AuthSuccess{}).
+		SetResult(res).
 		Post("http://localhost:18080/weflow/role/list")
 	if err != nil {
 		fmt.Println("err:", err)
 	}
 	fmt.Println("Response Info:", resp)
+	fmt.Println("Response Info:", res)
+}
+
+type Response[T any] struct {
+	Code int    `json:"code"` // 0:成功，其他：失败
+	Msg  string `json:"msg"`  // 错误信息
+	Data T      `json:"data"` // 数据
+}
+
+type RoleInfoResult struct {
+	ID         int64  `json:"id"`         // 唯一id
+	RoleID     string `json:"roleID"`     // 角色id
+	ParentID   string `json:"parentID"`   // 角色父id
+	RoleName   string `json:"roleName"`   // 角色名称
+	Status     int32  `json:"status"`     // 状态【1：未启用；2：已启用；3：锁定；】
+	Remark     string `json:"remark"`     // 描述
+	CreateUser string `json:"createUser"` // 创建人
+	UpdateUser string `json:"updateUser"` // 更新人
+	CreateTime string `json:"createTime"` // 创建时间
+	UpdateTime string `json:"updateTime"` // 更新时间
+}
+
+func TestGet(t *testing.T) {
+	res1, err := http.Get[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res1)
+
+	res2, err := http.GetString("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res2)
+}
+
+func TestPost(t *testing.T) {
+	type Role struct {
+		RoleName string `json:"roleName"`
+	}
+	var param = &Role{}
+	res1, err := http.Post[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list", param)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res1)
+
+	res2, err := http.PostString("http://localhost:18080/weflow/role/list", param)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res2)
+
+	res3, err := http.PostForm[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res3)
+
+	res4, err := http.PostFile[Response[any]]("http://localhost:18080/weflow/upload/file", "a.txt", "./testdata/a.txt")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res4)
+
+	res5, err := http.PostFiles[Response[any]]("http://localhost:18080/weflow/upload/file", map[string]string{
+		"a.txt": "./testdata/a.txt",
+	})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res5)
 }
