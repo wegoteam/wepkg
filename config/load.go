@@ -109,7 +109,7 @@ func NewConfig(configName, configType, profiles string, confPaths []string) *Con
 func initConfig() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("initConfig panic", err)
+			fmt.Errorf("initConfig panic %v \n", err)
 		}
 	}()
 	var profiles, configPath string
@@ -167,8 +167,8 @@ func parseFilePath(files string) (paths, fileName, fileType string) {
 
 // Load
 // @Description: 加载配置文件
-// @param: prefix
-// @param: data
+// @param: prefix 配置文件前缀
+// @param: data 配置文件数据指针地址
 // @return error
 func (config *Config) Load(prefix string, data interface{}) error {
 	c := config.Config

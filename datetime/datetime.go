@@ -18,16 +18,19 @@ import (
 )
 
 const (
-	DefaultDateTimePatternMilli = "Y-m-d H:i:s"
-	DefaultDateTimePatternMicro = "Y-m-d H:i:s.u"
-	DefaultDateTimePatternNano  = "Y-m-d H:i:s.U"
-	DateTimeLayout              = "2006-01-02 15:04:05"
-	DateTimeMilliLayout         = "2006-01-02 15:04:05.999"
-	DateTimeMicroLayout         = "2006-01-02 15:04:05.999999"
-	DateTimeNanoLayout          = "2006-01-02 15:04:05.999999999"
-	PinyinDateTimeLayout        = "2006年01月02日 15时04分05秒"
-	Pinyin2DateTimeLayout       = "2006年01月02日15时04分05秒"
-	UnderlineDateTimeLayout     = "2006/01/02 15:04:05"
+	DefaultDateTimePatternMilli  = "Y-m-d H:i:s"
+	DefaultDateTimePatternMicro  = "Y-m-d H:i:s.u"
+	DefaultDateTimePatternNano   = "Y-m-d H:i:s.U"
+	DateTimeLayout               = "2006-01-02 15:04:05"
+	DateTimeMilliLayout          = "2006-01-02 15:04:05.000"
+	DateTimeMicroLayout          = "2006-01-02 15:04:05.000000"
+	DateTimeNanoLayout           = "2006-01-02 15:04:05.000000000"
+	PinyinDateTimeLayout         = "2006年01月02日 15时04分05秒"
+	Pinyin2DateTimeLayout        = "2006年01月02日15时04分05秒"
+	UnderlineDateTimeLayout      = "2006/01/02 15:04:05"
+	UnderlineDateTimeMilliLayout = "2006/01/02 15:04:05.000"
+	UnderlineDateTimeMicroLayout = "2006/01/02 15:04:05.000000"
+	UnderlineDateTimeNanoLayout  = "2006/01/02 15:04:05.000000000"
 )
 
 // From
@@ -79,7 +82,7 @@ func Timestamp() int64 {
 // @Description: 获取当前毫秒级时间戳
 // @return int64
 func TimestampMilli() int64 {
-	//return time.Now().UnixNano()
+	//return time.Now().UnixMilli()
 	return timeUtil.Now().TimestampMilli()
 }
 

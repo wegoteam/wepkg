@@ -1,17 +1,19 @@
-package distributedlock
+package rlock
+
+// redis分布式锁
+// https://github.com/bsm/redislock
+// https://github.com/go-redsync/redsync
 
 //import (
-//	"context"
 //	"fmt"
-//	"github.com/bsm/redislock"
-//	"github.com/redis/go-redis/v9"
 //	"log"
 //	"time"
+//
+//	"github.com/bsm/redislock"
+//	"github.com/redis/go-redis/v9"
 //)
-///**
-//https://github.com/bsm/redislock
-// */
-//func Lock() {
+//
+//func main() {
 //	// Connect to redis.
 //	client := redis.NewClient(&redis.Options{
 //		Network: "tcp",
@@ -22,10 +24,8 @@ package distributedlock
 //	// Create a new lock client.
 //	locker := redislock.New(client)
 //
-//	ctx := context.Background()
-//
 //	// Try to obtain lock.
-//	lock, err := locker.Obtain(ctx, "my-key", 100*time.Millisecond, nil)
+//	lock, err := locker.Obtain("my-key", 100*time.Millisecond, nil)
 //	if err == redislock.ErrNotObtained {
 //		fmt.Println("Could not obtain lock!")
 //	} else if err != nil {
@@ -33,27 +33,28 @@ package distributedlock
 //	}
 //
 //	// Don't forget to defer Release.
-//	defer lock.Release(ctx)
+//	defer lock.Release()
 //	fmt.Println("I have a lock!")
 //
 //	// Sleep and check the remaining TTL.
 //	time.Sleep(50 * time.Millisecond)
-//	if ttl, err := lock.TTL(ctx); err != nil {
+//	if ttl, err := lock.TTL(); err != nil {
 //		log.Fatalln(err)
 //	} else if ttl > 0 {
 //		fmt.Println("Yay, I still have my lock!")
 //	}
 //
 //	// Extend my lock.
-//	if err := lock.Refresh(ctx, 100*time.Millisecond, nil); err != nil {
+//	if err := lock.Refresh(100*time.Millisecond, nil); err != nil {
 //		log.Fatalln(err)
 //	}
 //
 //	// Sleep a little longer, then check.
 //	time.Sleep(100 * time.Millisecond)
-//	if ttl, err := lock.TTL(ctx); err != nil {
+//	if ttl, err := lock.TTL(); err != nil {
 //		log.Fatalln(err)
 //	} else if ttl == 0 {
 //		fmt.Println("Now, my lock has expired!")
 //	}
+//
 //}
