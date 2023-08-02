@@ -13,7 +13,7 @@
 - 切片
 - 日志
 - 定时任务
-...
+- ...
 
 
 
@@ -175,10 +175,10 @@ func TestTime(t *testing.T) {
 ```
 
 ### bean
--[x] 属性复制
--[x] 结构体转map
--[x] map转结构体
--[x] 结构体字段、tag、值获取
+- [x] 属性复制
+- [x] 结构体转map
+- [x] map转结构体
+- [x] 结构体字段、tag、值获取
 ```go
 type A struct {
     Age  int    `json:"age"`
