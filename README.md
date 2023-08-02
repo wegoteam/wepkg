@@ -11,11 +11,14 @@
 - 条件表达式
 - 协程池
 - 切片
+- 日志
+- 定时任务
 ...
 
 
 
 ## 更新记录
+- v1.0.5：json、xml、log
 - v1.0.4：datatime、http、config、crypto、uuid/ulid
 - v1.0.3：加载配置
 - v1.0.1：雪花算法
@@ -35,8 +38,7 @@ go get -u github.com/wegoteam/wepkg@latest
 - 响应结构体
 - 分页
 
-### net/http
-封装http请求的客户端
+
 
 ### config
 加载配置：默认加载环境变量、配置文件、命令行参数
@@ -173,7 +175,10 @@ func TestTime(t *testing.T) {
 ```
 
 ### bean
-属性复制、结构体转map、map转结构体
+-[x] 属性复制
+-[x] 结构体转map
+-[x] map转结构体
+-[x] 结构体字段、tag、值获取
 ```go
 type A struct {
     Age  int    `json:"age"`
@@ -297,7 +302,7 @@ snowflake:
   method: 1
   #基础时间（ms单位），不能超过当前系统时间
   baseTime: 1582136402000
-  #机器码，必须由外部设定，最大值 2^WorkerIdBitLength-1
+  #机器码，必须由外部设定，最大值 2^bitLength-1
   workerId: 1
   #机器码位长，默认值6，取值范围 [1, 15]（要求：序列数位长+机器码位长不超过22）
   bitLength: 6
@@ -358,6 +363,248 @@ func TestSnowflakeId(t *testing.T) {
 func TestUUID(t *testing.T) {
 	fmt.Printf("uuid: %s\n", uuid.New())
 	fmt.Printf("ulid: %s\n", ulid.New())
+}
+```
+
+### log
+日志记录：支持日志文件切割，日志级别，日志格式化，日志文件压缩，日志文件清理
+
+配置文件设置方式：配置文件、手动设置
+- 日志配置配置读取./config/config.yaml文件的配置
+```yaml
+#日志配置
+logger:
+  #日志输出格式，可选项：json、text
+  format: text
+  #日志级别，可选项：trace、debug、info、warn、error、panic、fatal
+  level: info
+  #日志输出位置，可选项：console、file；多个用逗号分隔
+  output: console,file
+  #日志文件名
+  fileName: "./log/wegopkg.log"
+  #日志文件最大大小，单位：MB
+  maxSize: 10
+  #日志文件最大保存时间，单位：天
+  maxAge: 3
+  #日志文件最大备份数量
+  maxBackups: 50
+```
+- 设置SetLoggerConfig方法的参数配置日志
+```go
+func TestLogConfig(t *testing.T) {
+	log.SetLoggerConfig(log.LoggerConfig{
+		Level:  "trace",
+		Format: "text",
+		Output: "console",
+	})
+	config := log.GetLoggerConfig()
+	fmt.Printf("config=%v\n", config)
+	log.Trace("Something very low level.")
+	log.Debug("Useful debugging information.")
+	log.Info("Something noteworthy happened!")
+}
+```
+
+使用方法
+```go
+func TestLog(t *testing.T) {
+	log.Trace("Something very low level.")
+	log.Tracef("Something very low level. %s", "test")
+	log.Traceln("Something very low level.")
+
+	log.Debug("Useful debugging information.")
+	log.Debugf("Useful debugging information. %s", "test")
+	log.Debugln("Useful debugging information.")
+
+	log.Info("Something noteworthy happened!")
+	log.Infof("Something noteworthy happened! %s", "test")
+	log.Infoln("Something noteworthy happened!")
+
+	log.Notice("Something unusual happened.")
+	log.Noticef("Something unusual happened. %s", "test")
+	log.Noticef("Something unusual happened.")
+
+	log.Warn("You should probably take a look at this.")
+	log.Warnf("You should probably take a look at this. %s", "test")
+	log.Warnln("You should probably take a look at this.")
+
+	log.Error("Something failed but I'm not quitting.")
+	log.Errorf("Something failed but I'm not quitting. %s", "test")
+	log.Errorln("Something failed but I'm not quitting.")
+
+	// Calls os.Exit(1) after logging
+	log.Fatal("Bye.")
+	log.Fatalf("Bye. %s", "test")
+	log.Fatalln("Bye.")
+
+	// Calls panic() after logging
+	log.Panic("I'm bailing.")
+	log.Panicf("I'm bailing. %s", "test")
+	log.Panicln("I'm bailing.")
+
+}
+```
+
+
+### net
+-[x] http client的封装（get post put...）
+-[ ] rpc
+-[ ] websocket
+-[ ] tcp
+-[ ] udp
+-[ ] grpc
+-[ ] mqtt
+-[ ] nats
+#### net/http
+封装http请求的客户端
+
+```go
+func TestDefaultClientPOST(t *testing.T) {
+	client := http.BuildDefaultClient()
+	var res string
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(`{"roleName":""}`).
+		SetResult(res).
+		Post("http://localhost:18080/weflow/role/list")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", resp)
+	fmt.Println("Response Info:", res)
+}
+
+type Response[T any] struct {
+	Code int    `json:"code"` // 0:成功，其他：失败
+	Msg  string `json:"msg"`  // 错误信息
+	Data T      `json:"data"` // 数据
+}
+
+type RoleInfoResult struct {
+	ID         int64  `json:"id"`         // 唯一id
+	RoleID     string `json:"roleID"`     // 角色id
+	ParentID   string `json:"parentID"`   // 角色父id
+	RoleName   string `json:"roleName"`   // 角色名称
+	Status     int32  `json:"status"`     // 状态【1：未启用；2：已启用；3：锁定；】
+	Remark     string `json:"remark"`     // 描述
+	CreateUser string `json:"createUser"` // 创建人
+	UpdateUser string `json:"updateUser"` // 更新人
+	CreateTime string `json:"createTime"` // 创建时间
+	UpdateTime string `json:"updateTime"` // 更新时间
+}
+
+func TestGet(t *testing.T) {
+	res1, err := http.Get[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res1)
+
+	res2, err := http.GetString("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res2)
+}
+
+func TestPost(t *testing.T) {
+	type Role struct {
+		RoleName string `json:"roleName"`
+	}
+	var param = &Role{}
+	res1, err := http.Post[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list", param)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res1)
+
+	res2, err := http.PostString("http://localhost:18080/weflow/role/list", param)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res2)
+
+	res3, err := http.PostForm[Response[[]RoleInfoResult]]("http://localhost:18080/weflow/role/list",
+		map[string]string{
+			"roleName": "",
+		})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res3)
+
+	res4, err := http.PostFile[Response[any]]("http://localhost:18080/weflow/upload/file", "a.txt", "./testdata/a.txt")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res4)
+	
+	res5, err := http.PostFiles[Response[any]]("http://localhost:18080/weflow/upload/file", map[string]string{
+		"a.txt": "./testdata/a.txt",
+	})
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("Response Info:", res5)
+}
+```
+
+### io
+-[ ] 文件
+-[x] json
+-[x] xml
+-[ ] csv
+-[ ] excel
+-[ ] doc
+-[x] 压缩字符串
+-[ ] 压缩文件
+#### io/json
+json序列化和反序列化
+```go
+func TestFormat(t *testing.T) {
+	type Role struct {
+		RoleName string `json:"roleName"`
+	}
+	var param = &Role{
+		RoleName: "admin",
+	}
+	marshal, err := json.Marshal(param)
+	if err != nil {
+		fmt.Errorf("json.Marshal err: %v", err)
+	}
+	fmt.Println(marshal)
+
+	var role = &Role{}
+	err = json.Unmarshal(marshal, role)
+	if err != nil {
+		fmt.Errorf("json.Unmarshal err: %v", err)
+	}
+	fmt.Println(role)
+}
+```
+
+#### io/compress
+字符串压缩
+```go
+func TestCompress(t *testing.T) {
+	var dst []byte
+	var source = []byte("test")
+	encode := compress.Encode(dst, source)
+	fmt.Printf("encode:%s\n", encode)
+	fmt.Printf("dst encode:%s\n", dst)
+	var src []byte
+	decode, err := compress.Decode(encode, src)
+	if err != nil {
+		fmt.Errorf("err:%s\n", err.Error())
+	}
+	fmt.Printf("decode:%s\n", decode)
+	fmt.Printf("src decode:%s\n", src)
 }
 ```
 

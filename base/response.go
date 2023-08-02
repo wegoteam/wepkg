@@ -8,11 +8,26 @@ type Response struct {
 	Data interface{} `json:"data"` // 数据
 }
 
+// Result
+// @Description: 响应体
+type Result[T any] struct {
+	Code int    `json:"code"` // 0:成功，其他：失败
+	Msg  string `json:"msg"`  // 错误信息
+	Data T      `json:"data"` // 数据
+}
+
 // NewResponse
 // @Description: 创建响应体
 // @return *Response
 func NewResponse() *Response {
 	return &Response{}
+}
+
+// NewResult
+// @Description: 创建响应体
+// @return *Result[T]
+func NewResult[T any]() *Result[T] {
+	return &Result[T]{}
 }
 
 // Fail
@@ -21,6 +36,18 @@ func NewResponse() *Response {
 // @param: code
 // @param: err
 func (response *Response) Fail(code int, err string) *Response {
+	response.Code = code
+	response.Msg = err
+	return response
+}
+
+// Fail
+// @Description: 响应错误
+// @receiver: response
+// @param: code
+// @param: err
+// @return *Result[T]
+func (response *Result[T]) Fail(code int, err string) *Result[T] {
 	response.Code = code
 	response.Msg = err
 	return response
@@ -44,6 +71,20 @@ func Fail(code int, err string) *Response {
 // @param: code
 // @param: data
 // @param: err
+func (response *Result[T]) FailData(code int, data interface{}, err string) *Result[T] {
+	response.Code = code
+	response.Msg = err
+	response.Data = data
+	return response
+}
+
+// FailData
+// @Description: 响应错误
+// @receiver: response
+// @param: code
+// @param: data
+// @param: err
+// @return *Response
 func (response *Response) FailData(code int, data interface{}, err string) *Response {
 	response.Code = code
 	response.Msg = err
@@ -78,6 +119,16 @@ func (response *Response) Success() *Response {
 
 // Success
 // @Description: 响应成功
+// @receiver: response
+// @return *Result[T]
+func (response *Result[T]) Success() *Result[T] {
+	response.Code = 0
+	response.Msg = "success"
+	return response
+}
+
+// Success
+// @Description: 响应成功
 // @return *Response
 func Success() *Response {
 	return &Response{
@@ -92,6 +143,18 @@ func Success() *Response {
 // @receiver: response
 // @param: data
 func (response *Response) OK(data interface{}) *Response {
+	response.Code = 0
+	response.Data = data
+	response.Msg = "success"
+	return response
+}
+
+// OK
+// @Description: 响应成功
+// @receiver: response
+// @param: data
+// @return *Result[T]
+func (response *Result[T]) OK(data interface{}) *Result[T] {
 	response.Code = 0
 	response.Data = data
 	response.Msg = "success"
@@ -116,6 +179,19 @@ func OK(data interface{}) *Response {
 // @param: data
 // @param: err
 func (response *Response) OkMsg(data interface{}, err string) *Response {
+	response.Code = 0
+	response.Data = data
+	response.Msg = err
+	return response
+}
+
+// OkMsg
+// @Description: 响应成功
+// @receiver: response
+// @param: data
+// @param: err
+// @return *Result[T]
+func (response *Result[T]) OkMsg(data interface{}, err string) *Result[T] {
 	response.Code = 0
 	response.Data = data
 	response.Msg = err

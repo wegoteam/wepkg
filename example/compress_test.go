@@ -2,7 +2,7 @@ package example
 
 import (
 	"fmt"
-	"github.com/wegoteam/wepkg/compress"
+	"github.com/wegoteam/wepkg/io/compress"
 	"testing"
 )
 

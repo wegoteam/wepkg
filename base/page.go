@@ -6,7 +6,7 @@ import (
 
 // Page
 // @Description: 分页实体
-type Page[T comparable] struct {
+type Page[T any] struct {
 	Total    int64 `json:"total"`
 	PageNum  int   `json:"pageNum"`
 	PageSize int   `json:"pageSize"`

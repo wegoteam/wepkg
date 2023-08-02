@@ -1,3 +1,3 @@
-package file
+package files
 
 //github.com/gabriel-vasile/mimetype
