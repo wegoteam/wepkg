@@ -18,6 +18,7 @@
 
 
 ## 更新记录
+- v1.0.6：random、cron
 - v1.0.5：json、xml、log
 - v1.0.4：datatime、http、config、crypto、uuid/ulid
 - v1.0.3：加载配置
@@ -366,6 +367,17 @@ func TestUUID(t *testing.T) {
 }
 ```
 
+#### random
+随机字符串，随机数字
+```go
+func TestRandom(t *testing.T) {
+	randomStr := rand.RandomStr(10)
+	randomNum := rand.RandomNum(10)
+	fmt.Printf("randomStr: %s\n", randomStr)
+	fmt.Printf("randomNum: %s\n", randomNum)
+}
+```
+
 ### log
 日志记录：支持日志文件切割，日志级别，日志格式化，日志文件压缩，日志文件清理
 
@@ -556,14 +568,14 @@ func TestPost(t *testing.T) {
 ```
 
 ### io
--[ ] 文件
--[x] json
--[x] xml
--[ ] csv
--[ ] excel
--[ ] doc
--[x] 压缩字符串
--[ ] 压缩文件
+- [ ] 文件
+- [x] json
+- [x] xml
+- [ ] csv
+- [ ] excel
+- [ ] doc
+- [x] 压缩字符串
+- [ ] 压缩文件
 #### io/json
 json序列化和反序列化
 ```go
@@ -605,6 +617,41 @@ func TestCompress(t *testing.T) {
 	}
 	fmt.Printf("decode:%s\n", decode)
 	fmt.Printf("src decode:%s\n", src)
+}
+```
+
+### job
+任务调度
+#### jon/cron
+定时任务
+
+```text
+cron表达式语法：
+ ┌──分钟（0 - 59）
+ │ ┌──小时（0 - 23）
+ │ │ ┌──日（1 - 31）
+ │ │ │ ┌─月（1 - 12）
+ │ │ │ │ ┌─星期（0 - 6，表示从周日到周六）
+ │ │ │ │ │
+ *  *  *  *  * 被执行的命令
+ 秒 分 时 日 月 周
+```
+使用方法
+```go
+func TestCron(t *testing.T) {
+	jonID, _ := cron.AddJob("0/2 * * * * ?", JobTest1)
+	cron.AddJob("0/2 * * * * ?", JobTest2)
+	time.Sleep(time.Second * 10)
+	cron.DelJob(jonID)
+	time.Sleep(time.Second * 10)
+}
+
+func JobTest1() {
+	fmt.Println("JobTest1")
+}
+
+func JobTest2() {
+	fmt.Println("JobTest2")
 }
 ```
 
