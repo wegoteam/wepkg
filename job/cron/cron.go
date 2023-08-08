@@ -1,8 +1,8 @@
 package cron
 
 import (
-	"fmt"
 	cronUtil "github.com/robfig/cron/v3"
+	"github.com/wegoteam/wepkg/log"
 	"sync"
 )
 
@@ -45,9 +45,10 @@ func AddJob(seq string, jobFunc JobFunc) (int, error) {
 	}
 	entryID, err := cronjob.AddFunc(seq, jobFunc)
 	if err != nil {
-		fmt.Errorf("AddJob err %v \n", err)
+		log.Errorf("AddJob err %v \n", err)
 		return 0, err
 	}
+	log.Debugf("AddJob success entryID %v \n", entryID)
 	id := int(entryID)
 	jobMap[id] = entryID
 	return id, nil
@@ -69,4 +70,5 @@ func DelJob(jobID int) {
 		isInit = false
 		cronjob.Stop()
 	}
+	log.Debugf("DelJob success entryID %v \n", entryID)
 }
