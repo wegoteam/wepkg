@@ -145,7 +145,7 @@ func getConfig() *LoggerConfig {
 	}
 	isNotExist := bean.IsZero(loggerConfig)
 	if isNotExist {
-		fmt.Errorf("Init logger config error use default config")
+		fmt.Errorf("Init logger config error use default config \n")
 		return &LoggerConfig{
 			Format: "text",
 			Level:  "info",

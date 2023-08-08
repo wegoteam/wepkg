@@ -1,5 +1,8 @@
 package excel
 
-//https://github.com/qax-os/excelize
-//https://github.com/szyhf/go-excel
-//https://github.com/unidoc/unioffice
+//引用：https://github.com/qax-os/excelize
+//官方文档：https://xuri.me/excelize/zh-hans/workbook.html#OpenFile
+
+const (
+	DefaultSheetName = "Sheet1"
+)
