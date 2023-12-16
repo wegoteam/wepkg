@@ -34,7 +34,7 @@ func initMongoDBConfig() {
 	url := fmt.Sprintf("mongodb://%s", mongoConfig.Address)
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(url))
 	if err != nil {
-		panic(err)
+		fmt.Errorf("MongoDB connect failed: %v", err)
 	}
 	MongoClient = client
 }

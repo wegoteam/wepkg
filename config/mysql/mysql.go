@@ -40,6 +40,6 @@ func initMysqlConfig() {
 		},
 	)
 	if err != nil {
-		panic(err)
+		fmt.Errorf("mysql connect failed, err: %v", err)
 	}
 }

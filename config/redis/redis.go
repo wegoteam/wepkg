@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"github.com/redis/go-redis/v9"
 	"github.com/wegoteam/wepkg/config"
 	"sync"
@@ -37,6 +38,6 @@ func initRedisConfig() {
 	})
 	_, redisErr := RedisCliet.Ping(context.Background()).Result()
 	if redisErr != nil {
-		panic(redisErr)
+		fmt.Errorf("redis init error: %v", redisErr)
 	}
 }
